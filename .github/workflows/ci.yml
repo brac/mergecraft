@@ -9,6 +9,11 @@ on:
 permissions:
   contents: read
 
+env:
+  # Opt the JavaScript action runtime into Node 24 ahead of GitHub's June 2026
+  # default flip. Lets us catch action-side breakage early.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 jobs:
   build:
     name: Build
@@ -18,7 +23,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -40,7 +45,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
