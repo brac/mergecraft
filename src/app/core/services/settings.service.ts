@@ -14,8 +14,8 @@ const SCAN_DEPTH_KEY = 'mergecraft_scan_depth';
 const MODEL_KEY = 'mergecraft_model';
 const ANONYMIZE_AUTHORS_KEY = 'mergecraft_anonymize_authors';
 
-const VALID_DEPTHS = new Set<ScanDepth>(SCAN_DEPTH_OPTIONS.map(o => o.value));
-const VALID_MODELS = new Set<AnthropicModel>(ANTHROPIC_MODEL_OPTIONS.map(o => o.value));
+const VALID_DEPTHS = new Set<ScanDepth>(SCAN_DEPTH_OPTIONS.map((o) => o.value));
+const VALID_MODELS = new Set<AnthropicModel>(ANTHROPIC_MODEL_OPTIONS.map((o) => o.value));
 
 @Injectable({ providedIn: 'root' })
 export class SettingsService {
@@ -65,27 +65,27 @@ export class SettingsService {
     this.write(SCAN_DEPTH_KEY, settings.scanDepth);
     this.write(MODEL_KEY, settings.model);
     this.write(ANONYMIZE_AUTHORS_KEY, settings.anonymizeAuthors ? 'true' : 'false');
-    this.settingsVersion.update(v => v + 1);
+    this.settingsVersion.update((v) => v + 1);
   }
 
   setCostPreviewEnabled(enabled: boolean): void {
     this.write(COST_PREVIEW_KEY, enabled ? 'true' : 'false');
-    this.settingsVersion.update(v => v + 1);
+    this.settingsVersion.update((v) => v + 1);
   }
 
   setScanDepth(depth: ScanDepth): void {
     this.write(SCAN_DEPTH_KEY, depth);
-    this.settingsVersion.update(v => v + 1);
+    this.settingsVersion.update((v) => v + 1);
   }
 
   setModel(model: AnthropicModel): void {
     this.write(MODEL_KEY, model);
-    this.settingsVersion.update(v => v + 1);
+    this.settingsVersion.update((v) => v + 1);
   }
 
   setAnonymizeAuthors(enabled: boolean): void {
     this.write(ANONYMIZE_AUTHORS_KEY, enabled ? 'true' : 'false');
-    this.settingsVersion.update(v => v + 1);
+    this.settingsVersion.update((v) => v + 1);
   }
 
   clearSettings(): void {
@@ -95,7 +95,7 @@ export class SettingsService {
     this.remove(SCAN_DEPTH_KEY);
     this.remove(MODEL_KEY);
     this.remove(ANONYMIZE_AUTHORS_KEY);
-    this.settingsVersion.update(v => v + 1);
+    this.settingsVersion.update((v) => v + 1);
   }
 
   /** Signal that increments on any settings change. Read it in computed/effect to react to writes. */

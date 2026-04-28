@@ -38,11 +38,15 @@ import { SettingsService } from '../../core/services/settings.service';
       />
       <div class="flex items-baseline justify-between mb-6">
         <h1 class="text-2xl font-semibold">Analysis</h1>
-        <span class="text-xs text-gray-500">{{ depthLabel() }} scan · {{ modelDisplayLabel() }}</span>
+        <span class="text-xs text-gray-500"
+          >{{ depthLabel() }} scan · {{ modelDisplayLabel() }}</span
+        >
       </div>
 
       @if (loadError(); as err) {
-        <div class="mb-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 flex items-center justify-between">
+        <div
+          class="mb-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 flex items-center justify-between"
+        >
           <span>{{ err }}</span>
           <button
             type="button"
@@ -56,7 +60,9 @@ import { SettingsService } from '../../core/services/settings.service';
 
       @switch (status()) {
         @case ('idle') {
-          <div class="rounded border border-gray-200 bg-gray-50 px-4 py-8 text-center text-sm text-gray-700">
+          <div
+            class="rounded border border-gray-200 bg-gray-50 px-4 py-8 text-center text-sm text-gray-700"
+          >
             <p class="mb-3">
               No analysis run yet.
               <a routerLink="/" class="text-blue-600 hover:underline">Pick a repo and select PRs</a>
@@ -95,7 +101,10 @@ import { SettingsService } from '../../core/services/settings.service';
               <div class="font-medium text-amber-900 mb-2">Ready to analyze</div>
               <dl class="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 text-amber-900">
                 <dt>Model</dt>
-                <dd>{{ modelLabelFor(est.model) }} <span class="font-mono text-xs text-amber-700">({{ est.model }})</span></dd>
+                <dd>
+                  {{ modelLabelFor(est.model) }}
+                  <span class="font-mono text-xs text-amber-700">({{ est.model }})</span>
+                </dd>
                 <dt>Input tokens</dt>
                 <dd>{{ est.inputTokens.toLocaleString() }}</dd>
                 <dt>Output cap</dt>
@@ -110,7 +119,9 @@ import { SettingsService } from '../../core/services/settings.service';
                 </dd>
               </dl>
               @if (request()?.depth === 'deep') {
-                <div class="mt-3 rounded border border-amber-300 bg-white px-3 py-2 text-xs text-amber-900">
+                <div
+                  class="mt-3 rounded border border-amber-300 bg-white px-3 py-2 text-xs text-amber-900"
+                >
                   ⚠ Deep scan: PR diffs will be sent to Anthropic. Diffs occasionally include
                   accidentally-committed secrets. Cancel if unsure.
                 </div>
@@ -152,13 +163,17 @@ import { SettingsService } from '../../core/services/settings.service';
         }
         @case ('done') {
           @if (displayedResult(); as r) {
-            <div class="mb-4 rounded border border-purple-200 bg-purple-50 px-3 py-2 text-xs text-purple-900">
+            <div
+              class="mb-4 rounded border border-purple-200 bg-purple-50 px-3 py-2 text-xs text-purple-900"
+            >
               <span class="font-medium">AI-generated.</span> Findings may be inaccurate, fabricated,
               or shaped by prompt injection in PR text. Verify against the linked PRs before acting
               on anything here, and don't republish as fact.
             </div>
             @if (lastSavedAt()) {
-              <div class="mb-4 rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900 flex items-center justify-between">
+              <div
+                class="mb-4 rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900 flex items-center justify-between"
+              >
                 <span>Report saved to history — download started.</span>
                 <button
                   type="button"
@@ -170,7 +185,9 @@ import { SettingsService } from '../../core/services/settings.service';
               </div>
             }
             @if (resultSource() === 'loaded') {
-              <div class="mb-4 rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-900">
+              <div
+                class="mb-4 rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-900"
+              >
                 Loaded from a previously downloaded report.
               </div>
             }
@@ -311,7 +328,8 @@ import { SettingsService } from '../../core/services/settings.service';
                   </table>
                 </div>
                 <div class="mt-2 text-xs text-gray-500">
-                  {{ r.churn.totalFilesTouched }} files touched across {{ r.churn.totalPrsAnalyzed }}
+                  {{ r.churn.totalFilesTouched }} files touched across
+                  {{ r.churn.totalPrsAnalyzed }}
                   PRs.
                 </div>
               </section>
@@ -436,7 +454,7 @@ export class AnalysisComponent {
   protected readonly hasAnonymizableAuthors = computed(() => this.aliasMap().size > 0);
 
   protected toggleRevealAuthors(): void {
-    this.revealAuthors.update(v => !v);
+    this.revealAuthors.update((v) => !v);
   }
 
   private anonymize(r: MergecraftAnalysis, map: Map<string, string>): MergecraftAnalysis {
@@ -445,17 +463,17 @@ export class AnalysisComponent {
     return {
       ...r,
       summary: replace(r.summary),
-      antiPatterns: r.antiPatterns.map(p => ({
+      antiPatterns: r.antiPatterns.map((p) => ({
         ...p,
         title: replace(p.title),
         description: replace(p.description),
       })),
-      reviewFriction: r.reviewFriction.map(p => ({
+      reviewFriction: r.reviewFriction.map((p) => ({
         ...p,
         title: replace(p.title),
         description: replace(p.description),
       })),
-      authorTendencies: r.authorTendencies.map(a => ({
+      authorTendencies: r.authorTendencies.map((a) => ({
         ...a,
         author: map.get(a.author) ?? a.author,
         themes: a.themes.map(replace),

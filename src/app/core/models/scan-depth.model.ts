@@ -29,5 +29,5 @@ export const SCAN_DEPTH_OPTIONS: readonly ScanDepthOption[] = [
 export const DEFAULT_SCAN_DEPTH: ScanDepth = 'shallow';
 
 export function scanDepthLabel(depth: ScanDepth): string {
-  return SCAN_DEPTH_OPTIONS.find(o => o.value === depth)?.label ?? depth;
+  return SCAN_DEPTH_OPTIONS.find((o) => o.value === depth)?.label ?? depth;
 }

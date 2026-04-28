@@ -39,7 +39,10 @@ import { SettingsService } from './core/services/settings.service';
         <div
           class="mx-auto flex max-w-5xl items-center justify-between px-6 py-2 text-sm text-amber-900"
         >
-          <span>API keys aren't configured yet. Mergecraft can't fetch PRs or run analysis without them.</span>
+          <span
+            >API keys aren't configured yet. Mergecraft can't fetch PRs or run analysis without
+            them.</span
+          >
           <a
             routerLink="/settings"
             class="ml-4 rounded border border-amber-300 bg-white px-3 py-1 text-amber-900 hover:bg-amber-100"

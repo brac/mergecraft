@@ -49,7 +49,9 @@ const MAX_SELECTION = 30;
       </form>
 
       @if (!hasPat()) {
-        <div class="mb-4 rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+        <div
+          class="mb-4 rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900"
+        >
           GitHub PAT not set — go to Settings to add one before loading PRs.
         </div>
       }
@@ -62,7 +64,9 @@ const MAX_SELECTION = 30;
 
       @if (historyEntries().length > 0) {
         <div class="mb-6 rounded border border-gray-200">
-          <div class="flex items-center justify-between px-3 py-2 border-b border-gray-200 bg-gray-50">
+          <div
+            class="flex items-center justify-between px-3 py-2 border-b border-gray-200 bg-gray-50"
+          >
             <h2 class="text-sm font-medium text-gray-700">Recent analyses</h2>
             <button
               type="button"
@@ -132,7 +136,9 @@ const MAX_SELECTION = 30;
         </div>
 
         @if (capWarning()) {
-          <div class="mb-3 rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          <div
+            class="mb-3 rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900"
+          >
             Mergecraft caps selection at {{ maxSelection }} PRs. Deselect some to choose others.
           </div>
         }
@@ -165,9 +171,10 @@ const MAX_SELECTION = 30;
             }
           </div>
         </div>
-
       } @else if (loaded() && !loading()) {
-        <div class="rounded border border-gray-200 bg-gray-50 px-3 py-6 text-center text-sm text-gray-600">
+        <div
+          class="rounded border border-gray-200 bg-gray-50 px-3 py-6 text-center text-sm text-gray-600"
+        >
           No merged PRs found in the most recent page. Try another repo.
         </div>
       }
@@ -234,7 +241,9 @@ export class RepoSelectComponent {
   }
 
   protected selectAll(): void {
-    const all = this.prs().slice(0, MAX_SELECTION).map(p => p.number);
+    const all = this.prs()
+      .slice(0, MAX_SELECTION)
+      .map((p) => p.number);
     this.capWarning.set(this.prs().length > MAX_SELECTION);
     this.selected.set(new Set(all));
   }
@@ -257,7 +266,7 @@ export class RepoSelectComponent {
     this.capWarning.set(false);
 
     this.github.listMergedPrs(parsed.owner, parsed.repo).subscribe({
-      next: prs => {
+      next: (prs) => {
         this.prs.set(prs);
         this.loading.set(false);
         this.loaded.set(true);

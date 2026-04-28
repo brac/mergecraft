@@ -75,24 +75,22 @@ export class AnalysisService {
     this.inFlight = from(prNumbers)
       .pipe(
         mergeMap(
-          num =>
-            this.github
-              .fetchPrDetails(owner, repo, num, { includeFiles, includeDiff })
-              .pipe(
-                tap(() => {
-                  fetched += 1;
-                  this.progress.set({ current: fetched, total: prNumbers.length });
-                }),
-              ),
+          (num) =>
+            this.github.fetchPrDetails(owner, repo, num, { includeFiles, includeDiff }).pipe(
+              tap(() => {
+                fetched += 1;
+                this.progress.set({ current: fetched, total: prNumbers.length });
+              }),
+            ),
           FETCH_CONCURRENCY,
         ),
         toArray(),
-        switchMap(prs => {
+        switchMap((prs) => {
           this.pendingPrs = prs;
           if (this.settings.getCostPreviewEnabled()) {
             this.status.set('estimating');
             return this.anthropic.estimateCost(prs).pipe(
-              tap(estimate => {
+              tap((estimate) => {
                 this.estimate.set(estimate);
                 this.status.set('awaiting_confirmation');
               }),
@@ -100,7 +98,7 @@ export class AnalysisService {
           }
           return this.runAnthropic(prs);
         }),
-        catchError(err => {
+        catchError((err) => {
           this.recordError(err);
           return throwError(() => err);
         }),
@@ -142,13 +140,13 @@ export class AnalysisService {
     this.status.set('analyzing');
     const churn = this.computeChurn(prs);
     return this.anthropic.analyze(prs).pipe(
-      map(result => ({ ...result, churn })),
-      tap(result => {
+      map((result) => ({ ...result, churn })),
+      tap((result) => {
         this.result.set(result);
         this.status.set('done');
         this.persistAndDownload(result);
       }),
-      catchError(err => {
+      catchError((err) => {
         this.recordError(err);
         return throwError(() => err);
       }),
@@ -182,7 +180,7 @@ export class AnalysisService {
   private computeChurn(prs: PrData[]): ChurnAnalysis {
     const fileTouches = new Map<string, Set<number>>();
     const refLookup = new Map<number, PrReference>(
-      prs.map(p => [p.number, { number: p.number, title: p.title, url: p.url }]),
+      prs.map((p) => [p.number, { number: p.number, title: p.title, url: p.url }]),
     );
 
     for (const pr of prs) {
@@ -198,10 +196,10 @@ export class AnalysisService {
         prCount: prNums.size,
         prReferences: Array.from(prNums)
           .sort((a, b) => a - b)
-          .map(n => refLookup.get(n)!)
+          .map((n) => refLookup.get(n)!)
           .filter(Boolean),
       }))
-      .filter(h => h.prCount >= 2)
+      .filter((h) => h.prCount >= 2)
       .sort((a, b) => b.prCount - a.prCount)
       .slice(0, CHURN_TOP_N);
 

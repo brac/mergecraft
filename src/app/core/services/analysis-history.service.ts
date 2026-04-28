@@ -31,9 +31,9 @@ export class AnalysisHistoryService {
 
   saveToHistory(entry: AnalysisHistoryEntry): void {
     const current = this.read();
-    const next = [entry, ...current.filter(e => e.id !== entry.id)].slice(0, HISTORY_CAP);
+    const next = [entry, ...current.filter((e) => e.id !== entry.id)].slice(0, HISTORY_CAP);
     this.write(next);
-    this.version.update(v => v + 1);
+    this.version.update((v) => v + 1);
   }
 
   getHistory(): AnalysisHistoryEntry[] {
@@ -44,7 +44,7 @@ export class AnalysisHistoryService {
     if (typeof localStorage !== 'undefined') {
       localStorage.removeItem(HISTORY_KEY);
     }
-    this.version.update(v => v + 1);
+    this.version.update((v) => v + 1);
   }
 
   buildEntry(
@@ -95,7 +95,7 @@ export class AnalysisHistoryService {
   }
 
   loadReportFromFile(file: File): Observable<LoadedReport> {
-    return new Observable<LoadedReport>(observer => {
+    return new Observable<LoadedReport>((observer) => {
       const reader = new FileReader();
       reader.onload = () => {
         try {

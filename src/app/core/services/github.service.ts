@@ -76,7 +76,7 @@ export class GitHubService {
 
   listMergedPrs(owner: string, repo: string, maxCount = 100): Observable<PrData[]> {
     return this.fetchMergedPage(owner, repo, maxCount, 1, []).pipe(
-      catchError(err => this.mapError(err)),
+      catchError((err) => this.mapError(err)),
     );
   }
 
@@ -92,10 +92,10 @@ export class GitHubService {
     )}/pulls?state=closed&per_page=${LIST_PAGE_SIZE}&page=${page}&sort=updated&direction=desc`;
 
     return this.http.get<GhPullListItem[]>(url, { headers: this.headers() }).pipe(
-      switchMap(items => {
+      switchMap((items) => {
         const merged = items
-          .filter(item => item.merged_at !== null)
-          .map(item => this.mapListItemToPrData(item));
+          .filter((item) => item.merged_at !== null)
+          .map((item) => this.mapListItemToPrData(item));
         const combined = [...accumulated, ...merged];
         const reachedCap = combined.length >= maxCount;
         const lastPage = items.length < LIST_PAGE_SIZE;
@@ -122,16 +122,17 @@ export class GitHubService {
     const diffHeaders = this.headers().set('Accept', 'application/vnd.github.diff');
 
     const requests = {
-      pr: this.http.get<GhPullListItem & {
-        additions: number;
-        deletions: number;
-        changed_files: number;
-      }>(base, { headers }),
+      pr: this.http.get<
+        GhPullListItem & {
+          additions: number;
+          deletions: number;
+          changed_files: number;
+        }
+      >(base, { headers }),
       reviews: this.http.get<GhReview[]>(`${base}/reviews?per_page=100`, { headers }),
-      reviewComments: this.http.get<GhReviewComment[]>(
-        `${base}/comments?per_page=100`,
-        { headers },
-      ),
+      reviewComments: this.http.get<GhReviewComment[]>(`${base}/comments?per_page=100`, {
+        headers,
+      }),
       files: options.includeFiles
         ? this.http.get<GhPullFile[]>(`${base}/files?per_page=100`, { headers })
         : of<GhPullFile[]>([]),
@@ -154,13 +155,13 @@ export class GitHubService {
           additions: pr.additions,
           deletions: pr.deletions,
           changedFiles: pr.changed_files,
-          reviews: reviews.map(r => this.mapReview(r)),
-          reviewComments: reviewComments.map(c => this.mapReviewComment(c)),
-          files: files.map(f => this.mapFile(f)),
+          reviews: reviews.map((r) => this.mapReview(r)),
+          reviewComments: reviewComments.map((c) => this.mapReviewComment(c)),
+          files: files.map((f) => this.mapFile(f)),
           diff: keepDiff ? diff : undefined,
         };
       }),
-      catchError(err => this.mapError(err)),
+      catchError((err) => this.mapError(err)),
     );
   }
 
@@ -208,12 +209,18 @@ export class GitHubService {
       reviews: [],
       reviewComments: [],
       issueComments: [],
-      labels: item.labels.map(l => l.name),
+      labels: item.labels.map((l) => l.name),
     };
   }
 
   private mapReview(review: GhReview): Review {
-    const allowedStates = ['APPROVED', 'CHANGES_REQUESTED', 'COMMENTED', 'DISMISSED', 'PENDING'] as const;
+    const allowedStates = [
+      'APPROVED',
+      'CHANGES_REQUESTED',
+      'COMMENTED',
+      'DISMISSED',
+      'PENDING',
+    ] as const;
     const state = (allowedStates as readonly string[]).includes(review.state)
       ? (review.state as Review['state'])
       : 'COMMENTED';
@@ -256,7 +263,9 @@ export class GitHubService {
     console.error('GitHub API error', err);
     if (err instanceof HttpErrorResponse) {
       if (err.status === 401) {
-        return throwError(() => new GitHubApiError('Invalid GitHub PAT — check your settings', 401));
+        return throwError(
+          () => new GitHubApiError('Invalid GitHub PAT — check your settings', 401),
+        );
       }
       if (err.status === 404) {
         return throwError(

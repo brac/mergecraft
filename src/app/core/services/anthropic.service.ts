@@ -121,8 +121,8 @@ export class AnthropicService {
     return this.http
       .post<AnthropicMessageResponse>(ANTHROPIC_URL, body, { headers: this.headers(apiKey) })
       .pipe(
-        map(response => this.buildAnalysis(response, prs)),
-        catchError(err => this.mapError(err)),
+        map((response) => this.buildAnalysis(response, prs)),
+        catchError((err) => this.mapError(err)),
       );
   }
 
@@ -136,13 +136,11 @@ export class AnthropicService {
     const pricing = modelPricing(model);
     const body = this.buildMessagesBody(prs, model, false);
     return this.http
-      .post<{ input_tokens: number }>(
-        ANTHROPIC_COUNT_TOKENS_URL,
-        body,
-        { headers: this.headers(apiKey) },
-      )
+      .post<{
+        input_tokens: number;
+      }>(ANTHROPIC_COUNT_TOKENS_URL, body, { headers: this.headers(apiKey) })
       .pipe(
-        map(response => {
+        map((response) => {
           const inputTokens = response.input_tokens;
           const inputCostUsd = inputTokens * pricing.input;
           const maxOutputCostUsd = MAX_TOKENS * pricing.output;
@@ -156,12 +154,12 @@ export class AnthropicService {
             model,
           };
         }),
-        catchError(err => this.mapError(err)),
+        catchError((err) => this.mapError(err)),
       );
   }
 
   private buildMessagesBody(prs: PrData[], model: AnthropicModel, includeMaxTokens: boolean) {
-    const compact = prs.map(p => this.compactPr(p));
+    const compact = prs.map((p) => this.compactPr(p));
     const userMessage = `Here are ${prs.length} merged PRs from a single repository. Analyze cross-PR patterns and return the JSON object as specified.
 
 PRs:
@@ -200,20 +198,20 @@ ${JSON.stringify(compact, null, 2)}`;
       deletions: pr.deletions,
       changedFiles: pr.changedFiles,
       labels: pr.labels,
-      reviews: pr.reviews.slice(0, MAX_REVIEWS_PER_PR).map(r => ({
+      reviews: pr.reviews.slice(0, MAX_REVIEWS_PER_PR).map((r) => ({
         author: r.author,
         state: r.state,
         submittedAt: r.submittedAt,
         body: this.truncate(r.body, COMMENT_TRUNCATE),
       })),
-      reviewComments: pr.reviewComments.slice(0, MAX_REVIEW_COMMENTS_PER_PR).map(c => ({
+      reviewComments: pr.reviewComments.slice(0, MAX_REVIEW_COMMENTS_PER_PR).map((c) => ({
         author: c.author,
         path: c.path,
         body: this.truncate(c.body, COMMENT_TRUNCATE),
       })),
     };
     if (pr.files.length > 0) {
-      compact['files'] = pr.files.slice(0, MAX_FILES_PER_PR).map(f => ({
+      compact['files'] = pr.files.slice(0, MAX_FILES_PER_PR).map((f) => ({
         path: f.filename,
         status: f.status,
         additions: f.additions,
@@ -234,12 +232,12 @@ ${JSON.stringify(compact, null, 2)}`;
 
   private buildAnalysis(response: AnthropicMessageResponse, prs: PrData[]): MergecraftAnalysis {
     const text = response.content
-      .filter(b => b.type === 'text')
-      .map(b => b.text)
+      .filter((b) => b.type === 'text')
+      .map((b) => b.text)
       .join('');
     const raw = this.extractJson(text);
     const refLookup = new Map<number, PrReference>(
-      prs.map(p => [p.number, { number: p.number, title: p.title, url: p.url }]),
+      prs.map((p) => [p.number, { number: p.number, title: p.title, url: p.url }]),
     );
 
     return {
@@ -285,7 +283,7 @@ ${JSON.stringify(compact, null, 2)}`;
   ): T[] {
     if (!Array.isArray(raw)) return [];
     return raw
-      .filter(f => f && (f.title || f.description))
+      .filter((f) => f && (f.title || f.description))
       .map((f, i) => ({
         id: f.id || `finding-${i + 1}`,
         title: f.title || 'Untitled finding',
@@ -301,12 +299,12 @@ ${JSON.stringify(compact, null, 2)}`;
   ): AuthorTendency[] {
     if (!Array.isArray(raw)) return [];
     return raw
-      .filter(a => a && a.author)
-      .map(a => ({
+      .filter((a) => a && a.author)
+      .map((a) => ({
         author: a.author!,
         prCount: typeof a.prCount === 'number' ? a.prCount : 0,
         averagePrSize: typeof a.averagePrSize === 'number' ? a.averagePrSize : 0,
-        themes: Array.isArray(a.themes) ? a.themes.filter(t => typeof t === 'string') : [],
+        themes: Array.isArray(a.themes) ? a.themes.filter((t) => typeof t === 'string') : [],
         prReferences: this.resolveRefs(a.prReferences, refs),
       }));
   }

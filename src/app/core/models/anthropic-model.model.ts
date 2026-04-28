@@ -35,11 +35,11 @@ export const ANTHROPIC_MODEL_OPTIONS: readonly AnthropicModelOption[] = [
 export const DEFAULT_ANTHROPIC_MODEL: AnthropicModel = 'claude-haiku-4-5';
 
 export function modelLabel(m: AnthropicModel): string {
-  return ANTHROPIC_MODEL_OPTIONS.find(o => o.value === m)?.label ?? m;
+  return ANTHROPIC_MODEL_OPTIONS.find((o) => o.value === m)?.label ?? m;
 }
 
 export function modelPricing(m: AnthropicModel): { input: number; output: number } {
-  const opt = ANTHROPIC_MODEL_OPTIONS.find(o => o.value === m);
+  const opt = ANTHROPIC_MODEL_OPTIONS.find((o) => o.value === m);
   if (!opt) return { input: 0, output: 0 };
   return {
     input: opt.inputUsdPerMillion / 1_000_000,

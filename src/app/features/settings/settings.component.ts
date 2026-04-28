@@ -1,9 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  ANTHROPIC_MODEL_OPTIONS,
-  AnthropicModel,
-} from '../../core/models/anthropic-model.model';
+import { ANTHROPIC_MODEL_OPTIONS, AnthropicModel } from '../../core/models/anthropic-model.model';
 import { SCAN_DEPTH_OPTIONS, ScanDepth } from '../../core/models/scan-depth.model';
 import { SettingsService } from '../../core/services/settings.service';
 
@@ -20,7 +17,9 @@ import { SettingsService } from '../../core/services/settings.service';
 
       <form (ngSubmit)="save()" class="space-y-5" autocomplete="off">
         <div>
-          <label for="githubPat" class="block text-sm font-medium mb-1">GitHub Personal Access Token</label>
+          <label for="githubPat" class="block text-sm font-medium mb-1"
+            >GitHub Personal Access Token</label
+          >
           <input
             id="githubPat"
             name="githubPat"
@@ -44,7 +43,9 @@ import { SettingsService } from '../../core/services/settings.service';
         </div>
 
         <div>
-          <label for="anthropicApiKey" class="block text-sm font-medium mb-1">Anthropic API Key</label>
+          <label for="anthropicApiKey" class="block text-sm font-medium mb-1"
+            >Anthropic API Key</label
+          >
           <input
             id="anthropicApiKey"
             name="anthropicApiKey"
@@ -66,12 +67,7 @@ import { SettingsService } from '../../core/services/settings.service';
 
         <div class="flex items-center gap-3 text-sm">
           <label class="inline-flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              [checked]="reveal()"
-              (change)="toggleReveal()"
-              class="h-4 w-4"
-            />
+            <input type="checkbox" [checked]="reveal()" (change)="toggleReveal()" class="h-4 w-4" />
             <span>Show keys</span>
           </label>
         </div>
@@ -96,9 +92,11 @@ import { SettingsService } from '../../core/services/settings.service';
                 <span class="font-medium">{{ option.label }}</span>
                 <span class="block text-gray-500 mt-0.5">{{ option.summary }}</span>
                 @if (option.value === 'deep') {
-                  <span class="mt-1 block rounded border border-amber-200 bg-amber-50 px-2 py-1 text-xs text-amber-900">
-                    ⚠ Diffs are sent to Anthropic. They may contain accidentally-committed
-                    secrets (tokens, env vars). Review the PR set before running Deep scans.
+                  <span
+                    class="mt-1 block rounded border border-amber-200 bg-amber-50 px-2 py-1 text-xs text-amber-900"
+                  >
+                    ⚠ Diffs are sent to Anthropic. They may contain accidentally-committed secrets
+                    (tokens, env vars). Review the PR set before running Deep scans.
                   </span>
                 }
               </span>
@@ -143,8 +141,8 @@ import { SettingsService } from '../../core/services/settings.service';
             <span class="text-sm">
               <span class="font-medium">Show cost estimate before each analysis</span>
               <span class="block text-gray-500 mt-0.5">
-                Calls the free <code>count_tokens</code> endpoint to estimate spend, then waits
-                for confirmation. Turn off if you don't want the extra step.
+                Calls the free <code>count_tokens</code> endpoint to estimate spend, then waits for
+                confirmation. Turn off if you don't want the extra step.
               </span>
             </span>
           </label>
@@ -162,9 +160,9 @@ import { SettingsService } from '../../core/services/settings.service';
               <span class="font-medium">Anonymize authors by default</span>
               <span class="block text-gray-500 mt-0.5">
                 Replace GitHub logins with "Author A / B / C…" in displayed analysis output.
-                LLM-generated tendencies are public-data profiling — anonymization reduces the
-                risk of these reports being used as informal performance reviews or harassment
-                dossiers. You can toggle real names per session on the Analysis page.
+                LLM-generated tendencies are public-data profiling — anonymization reduces the risk
+                of these reports being used as informal performance reviews or harassment dossiers.
+                You can toggle real names per session on the Analysis page.
               </span>
             </span>
           </label>
@@ -214,7 +212,7 @@ export class SettingsComponent {
   );
 
   protected toggleReveal(): void {
-    this.reveal.update(v => !v);
+    this.reveal.update((v) => !v);
   }
 
   protected toggleCostPreview(): void {
