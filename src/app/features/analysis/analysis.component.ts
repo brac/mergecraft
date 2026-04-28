@@ -12,6 +12,7 @@ import { RouterLink } from '@angular/router';
 import {
   AntiPatternFinding,
   AuthorTendency,
+  MergecraftAnalysis,
   PrReference,
   ReviewFrictionFinding,
   Severity,
@@ -108,6 +109,12 @@ import { SettingsService } from '../../core/services/settings.service';
                   </span>
                 </dd>
               </dl>
+              @if (request()?.depth === 'deep') {
+                <div class="mt-3 rounded border border-amber-300 bg-white px-3 py-2 text-xs text-amber-900">
+                  ⚠ Deep scan: PR diffs will be sent to Anthropic. Diffs occasionally include
+                  accidentally-committed secrets. Cancel if unsure.
+                </div>
+              }
               <div class="mt-3 flex items-center gap-3">
                 <button
                   type="button"
@@ -144,7 +151,12 @@ import { SettingsService } from '../../core/services/settings.service';
           </div>
         }
         @case ('done') {
-          @if (result(); as r) {
+          @if (displayedResult(); as r) {
+            <div class="mb-4 rounded border border-purple-200 bg-purple-50 px-3 py-2 text-xs text-purple-900">
+              <span class="font-medium">AI-generated.</span> Findings may be inaccurate, fabricated,
+              or shaped by prompt injection in PR text. Verify against the linked PRs before acting
+              on anything here, and don't republish as fact.
+            </div>
             @if (lastSavedAt()) {
               <div class="mb-4 rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900 flex items-center justify-between">
                 <span>Report saved to history — download started.</span>
@@ -167,6 +179,15 @@ import { SettingsService } from '../../core/services/settings.service';
               <span>· {{ r.generatedAt | date: 'medium' }}</span>
               @if (request(); as req) {
                 <span>· {{ req.owner }}/{{ req.repo }}</span>
+              }
+              @if (hasAnonymizableAuthors()) {
+                <button
+                  type="button"
+                  (click)="toggleRevealAuthors()"
+                  class="text-blue-600 hover:underline"
+                >
+                  {{ revealAuthors() ? 'Hide author names' : 'Show author names' }}
+                </button>
               }
               <span class="ml-auto">
                 <button
@@ -297,7 +318,15 @@ import { SettingsService } from '../../core/services/settings.service';
             }
 
             <section class="mt-8">
-              <h2 class="text-lg font-semibold mb-3">Author tendencies</h2>
+              <div class="mb-3 flex items-center gap-2">
+                <h2 class="text-lg font-semibold">Author tendencies</h2>
+                @if (hasAnonymizableAuthors() && !revealAuthors()) {
+                  <span class="text-xs text-gray-500 italic">
+                    · Anonymized. Reviewer/commenter names referenced in free text may not be
+                    masked.
+                  </span>
+                }
+              </div>
               @if (r.authorTendencies.length === 0) {
                 <p class="text-sm text-gray-500">No per-author patterns surfaced.</p>
               } @else {
@@ -368,6 +397,7 @@ export class AnalysisComponent {
   protected readonly lastSavedAt = this.analysis.lastSavedAt;
   protected readonly resultSource = this.analysis.resultSource;
   protected readonly loadError = signal<string | null>(null);
+  protected readonly revealAuthors = signal(!this.settings.getAnonymizeAuthors());
 
   protected readonly percent = computed(() => {
     const p = this.progress();
@@ -385,6 +415,64 @@ export class AnalysisComponent {
     const req = this.request();
     return modelLabel(req?.model ?? this.settings.getModel());
   });
+
+  private readonly aliasMap = computed<Map<string, string>>(() => {
+    const r = this.result();
+    if (!r) return new Map();
+    const map = new Map<string, string>();
+    r.authorTendencies.forEach((a, idx) => {
+      if (a.author) map.set(a.author, `Author ${letterFor(idx)}`);
+    });
+    return map;
+  });
+
+  protected readonly displayedResult = computed<MergecraftAnalysis | null>(() => {
+    const r = this.result();
+    if (!r) return null;
+    if (this.revealAuthors()) return r;
+    return this.anonymize(r, this.aliasMap());
+  });
+
+  protected readonly hasAnonymizableAuthors = computed(() => this.aliasMap().size > 0);
+
+  protected toggleRevealAuthors(): void {
+    this.revealAuthors.update(v => !v);
+  }
+
+  private anonymize(r: MergecraftAnalysis, map: Map<string, string>): MergecraftAnalysis {
+    if (map.size === 0) return r;
+    const replace = (text: string) => this.replaceLogins(text, map);
+    return {
+      ...r,
+      summary: replace(r.summary),
+      antiPatterns: r.antiPatterns.map(p => ({
+        ...p,
+        title: replace(p.title),
+        description: replace(p.description),
+      })),
+      reviewFriction: r.reviewFriction.map(p => ({
+        ...p,
+        title: replace(p.title),
+        description: replace(p.description),
+      })),
+      authorTendencies: r.authorTendencies.map(a => ({
+        ...a,
+        author: map.get(a.author) ?? a.author,
+        themes: a.themes.map(replace),
+      })),
+    };
+  }
+
+  private replaceLogins(text: string, map: Map<string, string>): string {
+    if (!text) return text;
+    let out = text;
+    for (const [login, alias] of map) {
+      const escaped = login.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const re = new RegExp(`(?<![a-zA-Z0-9_-])@?${escaped}(?![a-zA-Z0-9_-])`, 'g');
+      out = out.replace(re, alias);
+    }
+    return out;
+  }
 
   protected confirm(): void {
     this.analysis.confirmAndAnalyze();
@@ -456,4 +544,9 @@ export class AnalysisComponent {
   protected trackRef(_: number, item: PrReference): number {
     return item.number;
   }
+}
+
+function letterFor(idx: number): string {
+  if (idx < 26) return String.fromCharCode(65 + idx);
+  return `${letterFor(Math.floor(idx / 26) - 1)}${letterFor(idx % 26)}`;
 }

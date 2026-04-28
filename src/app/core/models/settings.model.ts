@@ -7,4 +7,5 @@ export interface MergecraftSettings {
   costPreviewEnabled: boolean;
   scanDepth: ScanDepth;
   model: AnthropicModel;
+  anonymizeAuthors: boolean;
 }

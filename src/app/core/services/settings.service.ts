@@ -12,6 +12,7 @@ const ANTHROPIC_API_KEY_KEY = 'mergecraft_anthropic_api_key';
 const COST_PREVIEW_KEY = 'mergecraft_cost_preview_enabled';
 const SCAN_DEPTH_KEY = 'mergecraft_scan_depth';
 const MODEL_KEY = 'mergecraft_model';
+const ANONYMIZE_AUTHORS_KEY = 'mergecraft_anonymize_authors';
 
 const VALID_DEPTHS = new Set<ScanDepth>(SCAN_DEPTH_OPTIONS.map(o => o.value));
 const VALID_MODELS = new Set<AnthropicModel>(ANTHROPIC_MODEL_OPTIONS.map(o => o.value));
@@ -51,12 +52,19 @@ export class SettingsService {
     return DEFAULT_ANTHROPIC_MODEL;
   }
 
+  getAnonymizeAuthors(): boolean {
+    const stored = this.read(ANONYMIZE_AUTHORS_KEY);
+    if (stored === null) return true;
+    return stored !== 'false';
+  }
+
   saveSettings(settings: MergecraftSettings): void {
     this.write(GITHUB_PAT_KEY, settings.githubPat);
     this.write(ANTHROPIC_API_KEY_KEY, settings.anthropicApiKey);
     this.write(COST_PREVIEW_KEY, settings.costPreviewEnabled ? 'true' : 'false');
     this.write(SCAN_DEPTH_KEY, settings.scanDepth);
     this.write(MODEL_KEY, settings.model);
+    this.write(ANONYMIZE_AUTHORS_KEY, settings.anonymizeAuthors ? 'true' : 'false');
     this.settingsVersion.update(v => v + 1);
   }
 
@@ -75,12 +83,18 @@ export class SettingsService {
     this.settingsVersion.update(v => v + 1);
   }
 
+  setAnonymizeAuthors(enabled: boolean): void {
+    this.write(ANONYMIZE_AUTHORS_KEY, enabled ? 'true' : 'false');
+    this.settingsVersion.update(v => v + 1);
+  }
+
   clearSettings(): void {
     this.remove(GITHUB_PAT_KEY);
     this.remove(ANTHROPIC_API_KEY_KEY);
     this.remove(COST_PREVIEW_KEY);
     this.remove(SCAN_DEPTH_KEY);
     this.remove(MODEL_KEY);
+    this.remove(ANONYMIZE_AUTHORS_KEY);
     this.settingsVersion.update(v => v + 1);
   }
 

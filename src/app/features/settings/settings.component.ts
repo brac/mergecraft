@@ -95,6 +95,12 @@ import { SettingsService } from '../../core/services/settings.service';
               <span class="text-sm">
                 <span class="font-medium">{{ option.label }}</span>
                 <span class="block text-gray-500 mt-0.5">{{ option.summary }}</span>
+                @if (option.value === 'deep') {
+                  <span class="mt-1 block rounded border border-amber-200 bg-amber-50 px-2 py-1 text-xs text-amber-900">
+                    ⚠ Diffs are sent to Anthropic. They may contain accidentally-committed
+                    secrets (tokens, env vars). Review the PR set before running Deep scans.
+                  </span>
+                }
               </span>
             </label>
           }
@@ -144,6 +150,26 @@ import { SettingsService } from '../../core/services/settings.service';
           </label>
         </div>
 
+        <div class="border-t border-gray-100 pt-5">
+          <label class="inline-flex items-start gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              [checked]="anonymizeAuthors()"
+              (change)="toggleAnonymizeAuthors()"
+              class="h-4 w-4 mt-0.5"
+            />
+            <span class="text-sm">
+              <span class="font-medium">Anonymize authors by default</span>
+              <span class="block text-gray-500 mt-0.5">
+                Replace GitHub logins with "Author A / B / C…" in displayed analysis output.
+                LLM-generated tendencies are public-data profiling — anonymization reduces the
+                risk of these reports being used as informal performance reviews or harassment
+                dossiers. You can toggle real names per session on the Analysis page.
+              </span>
+            </span>
+          </label>
+        </div>
+
         <div class="flex items-center gap-3 pt-2">
           <button
             type="submit"
@@ -178,6 +204,7 @@ export class SettingsComponent {
   protected readonly costPreview = signal(this.settingsService.getCostPreviewEnabled());
   protected readonly scanDepth = signal<ScanDepth>(this.settingsService.getScanDepth());
   protected readonly model = signal<AnthropicModel>(this.settingsService.getModel());
+  protected readonly anonymizeAuthors = signal(this.settingsService.getAnonymizeAuthors());
   protected readonly reveal = signal(false);
   protected readonly status = signal<'idle' | 'saved' | 'cleared'>('idle');
   protected readonly depthOptions = SCAN_DEPTH_OPTIONS;
@@ -194,6 +221,12 @@ export class SettingsComponent {
     const next = !this.costPreview();
     this.costPreview.set(next);
     this.settingsService.setCostPreviewEnabled(next);
+  }
+
+  protected toggleAnonymizeAuthors(): void {
+    const next = !this.anonymizeAuthors();
+    this.anonymizeAuthors.set(next);
+    this.settingsService.setAnonymizeAuthors(next);
   }
 
   protected setDepth(depth: ScanDepth): void {
@@ -214,6 +247,7 @@ export class SettingsComponent {
       costPreviewEnabled: this.costPreview(),
       scanDepth: this.scanDepth(),
       model: this.model(),
+      anonymizeAuthors: this.anonymizeAuthors(),
     });
     this.status.set('saved');
   }
@@ -225,6 +259,7 @@ export class SettingsComponent {
     this.costPreview.set(true);
     this.scanDepth.set('shallow');
     this.model.set('claude-haiku-4-5');
+    this.anonymizeAuthors.set(true);
     this.status.set('cleared');
   }
 }

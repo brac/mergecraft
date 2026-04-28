@@ -52,6 +52,30 @@ import { SettingsService } from './core/services/settings.service';
     <main>
       <router-outlet />
     </main>
+
+    <footer class="mt-12 border-t border-gray-200 bg-gray-50">
+      <div
+        class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-6 py-4 text-xs text-gray-600"
+      >
+        <span>
+          Static SPA · No backend · No telemetry · Keys live only in this browser's localStorage.
+        </span>
+        <span class="flex items-center gap-3">
+          <a
+            href="https://github.com/brac/mergecraft"
+            target="_blank"
+            rel="noopener"
+            class="hover:text-gray-900 hover:underline"
+            >Source</a
+          >
+          <span class="text-gray-300">·</span>
+          <span class="text-gray-500">
+            Use your own API keys at your own risk. Browser extensions, malware, or compromised
+            devices can read localStorage — this site cannot protect against that.
+          </span>
+        </span>
+      </div>
+    </footer>
   `,
 })
 export class App {

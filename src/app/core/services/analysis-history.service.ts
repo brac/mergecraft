@@ -71,6 +71,11 @@ export class AnalysisHistoryService {
   ): void {
     if (typeof document === 'undefined') return;
     const payload = {
+      generatedBy: 'Mergecraft (https://github.com/brac/mergecraft)',
+      disclaimer:
+        'AI-generated. Findings may be inaccurate, fabricated, or shaped by prompt injection ' +
+        'in PR text. Verify against linked PRs before acting on anything here. Do not republish ' +
+        'as fact, and do not use as input to performance reviews.',
       analysis,
       churn,
       exportedAt: when.toISOString(),
