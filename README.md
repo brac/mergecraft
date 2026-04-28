@@ -1,5 +1,8 @@
 # Mergecraft
 
+[![CI](https://github.com/brac/mergecraft/actions/workflows/ci.yml/badge.svg)](https://github.com/brac/mergecraft/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 LLM-powered cross-PR retrospective analysis. No backend, no telemetry, no key custody — runs entirely in your browser using API keys you bring.
 
 ## What it does

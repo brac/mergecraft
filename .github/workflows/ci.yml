@@ -35,7 +35,6 @@ jobs:
   format:
     name: Format check
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
@@ -48,4 +47,4 @@ jobs:
         run: npm ci
 
       - name: Prettier check
-        run: npx prettier --check "src/**/*.{ts,html,css,json}"
+        run: npm run format:check
